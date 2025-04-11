@@ -19,6 +19,23 @@ username_prefix = "instagram.com/"
 
 
 class InstaUnfollowChecker:
+    """
+    InstaUnfollowChecker is a class designed to analyze Instagram data
+    extracted from a ZIP file containing followers and following lists.
+
+    It provides functionality to:
+    - Unzip the provided ZIP file and extract its contents.
+    - Parse the extracted HTML files to retrieve lists of usernames
+      for both followers and accounts being followed.
+    - Identify users who are being followed but do not follow back
+      (unfollowers).
+    - Optionally save the lists of followers, following, and unfollowers
+      to text files.
+    - Perform a search to check if a specific username is following the
+      user, with an option for case-insensitive comparison.
+    - Print results to the console, including the total count of
+      unfollowers and the status of the searched username.
+    """
 
     def __init__(
         self,
@@ -28,11 +45,14 @@ class InstaUnfollowChecker:
         verbose: bool,
         save: bool
             ):
+        # Path to the ZIP file containing Instagram data
         self.filepath = filepath
+        # Username to search for in the followers list
         self.search_name = search_name
+        # enable case-insensitive username search
         self.case_insensitive = case_insensitive
         self.verbose = verbose
-        self.save = save
+        self.save = save  # Save results to files or not
 
         self.following: list[str] = []
         self.followers: list[str] = []
