@@ -147,7 +147,7 @@ class InstaUnfollowChecker:
                 print(f"{self.search_name} is not following you.")
             print()  # Print newline
 
-    def run(self) -> None|list[str]:
+    def run(self) -> None | list[str]:
         """Run the checker"""
 
         following: list[str] = []

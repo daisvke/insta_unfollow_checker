@@ -15,6 +15,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.unfollowers = []
         self.check_vars = {}
         self.visit_btn = None
+        self.created_buttons = False
 
         super().__init__(master)
         master.title("Insta Unfollow Checker Viewer")
@@ -28,10 +29,6 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.top_frame = tk.Frame(self, bg='grey', height=40)
         self.top_frame.pack(fill=tk.X)
 
-        # Button to open ZIP file
-        open_zip_btn = tk.Button(self.top_frame, text="Open", command=self.open_zip)
-        open_zip_btn.pack(padx=10, pady=5, side=tk.LEFT)
-
         # Treeview and Scrollbar
         self.tree_frame = tk.Frame(self)
         self.tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -39,7 +36,10 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.tree_scroll = tk.Scrollbar(self.tree_frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.tree = ttk.Treeview(self.tree_frame, columns=("Users"), show="headings", yscrollcommand=self.tree_scroll.set)
+        self.tree = ttk.Treeview(
+                self.tree_frame, columns=("Users"), show="headings",
+                yscrollcommand=self.tree_scroll.set
+            )
         self.tree.pack(fill=tk.BOTH, expand=True)
 
         self.tree.heading("Users", text="Users")
@@ -47,12 +47,19 @@ class InstaUnfollowCheckerViewer(tk.Frame):
 
         self.tree_scroll.config(command=self.tree.yview)
 
-        # Bind the hover events to show/hide tooltip
-        self.create_tooltip(
-            open_zip_btn,
+        self.create_button(
+            "Open",
+            self.open_zip,
             "Click to open the ZIP file\nwith the Instagram Data",
             "left"
-            )
+        )
+
+        self.create_button(
+            "Load",
+            self.load_list_from_file,
+            "Click to open the ZIP file\nwith the Instagram Data",
+            "left"
+        )
 
         # Del key binding for deleting entries
         self.tree.bind("<Delete>", self.remove_selected_entry)
@@ -70,7 +77,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
             # Remove the current item from the Treeview
             self.tree.delete(item_id)
 
-    def get_unfollowers(self) -> None|list[str]:
+    def get_unfollowers(self) -> None | list[str]:
         checker = InstaUnfollowChecker(
             self.filepath,
             "",
@@ -81,7 +88,6 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         )
         return checker.run()
 
-
     def open_profile(self) -> None:
         """
         Opens the user's Instagram profile in the browser.
@@ -91,7 +97,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
 
         # Loop through all the selected items
         for item_id in selected_items:
-            username = self.tree.item(item_id, "values")[0] 
+            username = self.tree.item(item_id, "values")[0]
             url = f"https://www.instagram.com/{username}/"
             try:
                 webbrowser.open(url)
@@ -107,58 +113,49 @@ class InstaUnfollowCheckerViewer(tk.Frame):
                 title="Select a Zip file",
                 filetypes=[("Zip files", "*.zip")]
             )
+        if not self.filepath:
+            return
 
         self.unfollowers = self.get_unfollowers()
         if not self.unfollowers:
-            messagebox.showerror("Error", f"Unfollowers list is empty")
+            messagebox.showerror("Error", "Unfollowers list is empty")
             return
 
         # Add users on the Tree
         self.populate_table()
 
         # Only create buttons if not created already
-        if not self.visit_btn:
-            # Button to visit the selected user's account
-            self.visit_btn = tk.Button(
-                    self.top_frame,
-                    text="Visit",
-                    command=self.open_profile
-                )
-            self.visit_btn.pack(padx=10, pady=5, side=tk.LEFT)
+        if not self.created_buttons:
+            self.create_buttons_to_handle_list()
+            self.created_buttons = True
 
-            # Button to delete the selected account from the list
-            remove_btn = tk.Button(
-                    self.top_frame,
-                    text="Remove",
-                    command=self.remove_selected_entry
-                )
-            remove_btn.pack(padx=10, pady=5, side=tk.LEFT)
+    def load_list_from_file(self) -> None:
+        """
+        Open a file containing a list of usernames
+        """
+        # Open the file by selecting it from the file dialog
+        filepath = filedialog.askopenfilename(
+                title="Select a file",
+                filetypes=[("txt files", "*.txt")]
+            )
+        if not filepath:
+            return
 
-            # Button to save the list to an outfile
-            save_btn = tk.Button(
-                    self.top_frame,
-                    text="Save",
-                    command=self.save_list_to_file
-                )
-            save_btn.pack(padx=10, pady=5, side=tk.LEFT)
+        try:
+            with open(filepath, 'r') as file:
+                self.unfollowers = []  # Reset the array
+                file_content = file.read()  # Get the content of the file
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to read file: {e}")
 
-            # Bind the hover events to show/hide tooltip
-            self.create_tooltip(
-                    self.visit_btn,
-                    "Click to visit the account\nin your web browser",
-                    "right"
-                )
-            self.create_tooltip(
-                    remove_btn,
-                    "Click to remove the selected\naccount from the list",
-                    "right"
-                )
-            self.create_tooltip(
-                    save_btn,
-                    "Click to save the list to a file",
-                    "right"
-                )
-            
+        for username in file_content.splitlines():
+            self.unfollowers.append(username.strip())
+
+        self.populate_table()  # Add the unfollowers to the Tree
+        # Only create buttons if not created already
+        if not self.created_buttons:
+            self.create_buttons_to_handle_list()
+
     def save_list_to_file(self):
         try:
             with open(save_list_to_file, 'w') as file:
@@ -174,11 +171,52 @@ class InstaUnfollowCheckerViewer(tk.Frame):
                 "Information", f"Saved list to {save_list_to_file}."
             )
 
+    def create_buttons_to_handle_list(self) -> None:
+        self.create_button(
+            "Save",
+            self.save_list_to_file,
+            "Click to save the list to a file",
+            "right"
+            )
+
+        self.create_button(
+            "Remove",
+            self.remove_selected_entry,
+            "Click to remove the selected\naccount from the list",
+            "right"
+            )
+
+        self.create_button(
+            "Visit",
+            self.open_profile,
+            "Click to visit the account\nin your web browser",
+            "right"
+            )
+
+    def create_button(
+                self, text: str, cmd, description: str, side: str
+            ) -> None:
+        btn = tk.Button(
+                self.top_frame,
+                text=text,
+                command=cmd
+            )
+        btn.pack(padx=10, pady=5, side=tk.LEFT)
+
+        self.create_tooltip(
+                btn,
+                description,
+                side
+            )
+
     def create_tooltip(self, widget, text: str, side: str) -> None:
         """
         Create a tooltip for the given widget.
         """
-        tooltip = tk.Label(self, text=text, background="lightyellow", relief="solid", bd=1, padx=5, pady=2)
+        tooltip = tk.Label(
+                self, text=text, background="lightyellow", relief="solid",
+                bd=1, padx=5, pady=2
+            )
         tooltip.place_forget()  # Hide the tooltip initially
 
         offsetx = 110 if side == "right" else -10
@@ -192,8 +230,8 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         def hide_tooltip(event):
             tooltip.place_forget()  # Hide the tooltip when mouse leaves
 
-        widget.bind("<Enter>", show_tooltip)  # Show tooltip when mouse enters the widget
-        widget.bind("<Leave>", hide_tooltip)  # Hide tooltip when mouse leaves the widget
+        widget.bind("<Enter>", show_tooltip)  # Show when mouse enters widget
+        widget.bind("<Leave>", hide_tooltip)  # Hide when mouse leaves widget
 
     def populate_table(self) -> None:
         # Clear previous data
