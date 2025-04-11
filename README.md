@@ -13,6 +13,36 @@ This Python script checks for users who are not following you back on Instagram.
 
 1. Clone the repository or download the script.
 2. Ensure you have Python 3 installed on your system.
+3. Get your information in a ZIP file from your Instagram account
+
+## Downloading your information from Accounts Center
+
+To download a copy of your information from Instagram's Accounts Center, follow these steps:
+
+1. **Navigate to Accounts Center**:
+   - Click on **Accounts Center**.
+   - Go to **Your information and permissions**.
+
+2. **Download information**:
+   - Click on **Download your information**.
+   - Choose **Download or transfer information**.
+
+3. **Select profiles**:
+   - Select the profiles you want to download information from and click **Next**.
+
+4. **Choose information amount**:
+   - Specify how much information you wish to download and click **Next**.
+   - You have to select at least `following and followers`.
+
+5. **Select Download Method**:
+   - **Transfer to Destination**: Choose a destination and schedule future transfers. You may need to sign in to the destination's app or website. Click **Start transfer** and enter your Instagram password.
+   - **Download to Device**: Choose your file options, including:
+     - Date range
+     - Notification email
+     - Download format
+     - Quality of photos, videos, and other media.
+   - Click **Create files** to finalize your request.
+   - The ZIP file will be ready in a few hours. 
 
 ## Usage
 
@@ -53,4 +83,3 @@ This command will:
   - `results/following.txt`
   - `results/followers.txt`
   - `results/unfollowers.txt`
-  
