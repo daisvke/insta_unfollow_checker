@@ -7,7 +7,10 @@ from argparse import ArgumentParser
 from ascii_format import DONE, ERROR, YELLOW, RESET, INFO
 
 extract_to_directory = "tmp/"
-save_to_file = "unfollowers.txt"
+save_to_directory = "results/"
+unfollowers_outfile = save_to_directory + "unfollowers.txt"
+following_outfile = save_to_directory + "following.txt"
+followers_outfile = save_to_directory + "followers.txt"
 path_to_lists_folder = \
     extract_to_directory + "connections/followers_and_following/"
 path_to_following_folder = path_to_lists_folder + "following.html"
@@ -85,23 +88,37 @@ class InstaUnfollowChecker:
                 count += 1
         return unfollowers, count
 
-    def print_results(self, unfollowers: list[str], count: int) -> None:
+    def save_list_to_file(self, filename: str, list: list[str]) -> None:
+        """Save the given list to a file"""
+        with open(filename, 'w') as file:
+            for username in list:
+                file.write(f"{username}\n")
+
+
+    def print_results(
+            self, unfollowers: list[str], followers: list[str], count: int
+            ) -> None:
         """Print the results."""
         # If the mode is on, open the file in which we will save the resuts
         if self.save:
-            file = open(save_to_file, 'w')
+            file = open(unfollowers_outfile, 'w')
 
         # Print each username and write it on the outfile if the mode is on
         for username in unfollowers:
             if self.save:
                 file.write(f"{username}\n")
-            print(username)
+            if not self.search_name:
+                print(username)
 
         # Print some useful information at the end
         if self.verbose:
-            print(f"\n{INFO} Total: {YELLOW}{count}{RESET} unfollowers.")
-            if self.save:
-                print(f"{INFO} Saved results in {YELLOW}{save_to_file}{RESET}")
+            if not self.search_name:
+                print(f"\n{INFO} Total: {YELLOW}{count}{RESET} unfollowers.")
+        if self.search_name:
+            if self.search_name in followers:
+                print(f"{self.search_name} is following you.")
+            else:
+                print(f"{self.search_name} is not following you.")
 
     def run(self) -> None:
         """Run the checker"""
@@ -111,6 +128,10 @@ class InstaUnfollowChecker:
         unfollowers: list[str] = []
 
         try:
+            if self.save:
+                # Create the directory if it doesn't exist
+                os.makedirs(save_to_directory, exist_ok=True)
+
             # Unzip the ZIP file to get its content
             self.unzip()
 
@@ -119,9 +140,23 @@ class InstaUnfollowChecker:
             # Get the followers' usernames
             followers = self.parse_list(path_to_followers_folder)
 
-            # Get the unfollowers' list and print the results
+            # Get the unfollowers' list and print the results, save the
+            # unfollowers if the mode is on
             unfollowers, count = self.get_unfollowers(following, followers)
-            self.print_results(unfollowers, count)
+            self.print_results(unfollowers, followers, count)
+
+            # Save the following/followers lists to files if the mode is on
+            if self.save:
+                self.save_list_to_file(following_outfile, following)
+                self.save_list_to_file(followers_outfile, followers)
+                if self.verbose:
+                    print(
+                            f"{INFO} Saved results in "
+                            f"{YELLOW}{unfollowers_outfile}{RESET}, "
+                            f"{YELLOW}{following_outfile}{RESET}, "
+                            f"{YELLOW}{following_outfile}{RESET}"
+                        )
+
 
         except Exception as e:
             print(f"{ERROR} {e}\n", file=stderr)
@@ -140,7 +175,7 @@ def parse_args():
         '-v', '--verbose', action='store_true', help="Enable verbose mode.")
     parser.add_argument(
         '-o', '--outfile', action='store_true',
-        help="Save the unfollowers' list in a file"
+        help="Save the followers/following/unfollowers lists in .txt files"
     )
     parser.add_argument(
         '-s', '--search-username', type=str,
@@ -152,10 +187,10 @@ def parse_args():
 
     args = parser.parse_args()
 
-    if (args.case_insensitive and not args.search_string):
+    if (args.case_insensitive and not args.search_username):
         parser.error(
             "-i/--case-insensitive option can only be used "
-            "with -s/--search-string."
+            "with -s/--search-username."
             )
 
     return parser.parse_args()
