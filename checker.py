@@ -43,7 +43,8 @@ class InstaUnfollowChecker:
         search_name: str,
         case_insensitive: bool,
         verbose: bool,
-        save: bool
+        save: bool,
+        return_list: bool
             ):
         # Path to the ZIP file containing Instagram data
         self.filepath = filepath
@@ -53,6 +54,7 @@ class InstaUnfollowChecker:
         self.case_insensitive = case_insensitive
         self.verbose = verbose
         self.save = save  # Save results to files or not
+        self.return_list = return_list  # Only return the unfollowers' list
 
         self.following: list[str] = []
         self.followers: list[str] = []
@@ -168,6 +170,10 @@ class InstaUnfollowChecker:
             # Get the unfollowers' list and print the results, save the
             # unfollowers if the mode is on
             unfollowers, count = self.get_unfollowers(following, followers)
+
+            if self.return_list:
+                return unfollowers
+
             self.print_results(unfollowers, followers, count)
 
             # Save the following/followers lists to files if the mode is on
@@ -229,7 +235,8 @@ if __name__ == "__main__":
             args.search_username,
             args.case_insensitive,
             args.verbose,
-            args.outfile
+            args.outfile,
+            False
             )
 
     checker.run()
