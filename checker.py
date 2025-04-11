@@ -94,7 +94,6 @@ class InstaUnfollowChecker:
             for username in list:
                 file.write(f"{username}\n")
 
-
     def print_results(
             self, unfollowers: list[str], followers: list[str], count: int
             ) -> None:
@@ -115,10 +114,16 @@ class InstaUnfollowChecker:
             if not self.search_name:
                 print(f"\n{INFO} Total: {YELLOW}{count}{RESET} unfollowers.")
         if self.search_name:
-            if self.search_name in followers:
+            if ((not self.case_insensitive and self.search_name in followers)
+                or (  # If case insensitive mode is on, we check the
+                      # strings in lower case
+                    self.case_insensitive and
+                    self.search_name.lower() in [f.lower() for f in followers]
+                    )):
                 print(f"{self.search_name} is following you.")
             else:
                 print(f"{self.search_name} is not following you.")
+            print()  # Print newline
 
     def run(self) -> None:
         """Run the checker"""
@@ -156,7 +161,6 @@ class InstaUnfollowChecker:
                             f"{YELLOW}{following_outfile}{RESET}, "
                             f"{YELLOW}{following_outfile}{RESET}"
                         )
-
 
         except Exception as e:
             print(f"{ERROR} {e}\n", file=stderr)
