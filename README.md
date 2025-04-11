@@ -44,6 +44,8 @@ To download a copy of your information from Instagram's Accounts Center, follow 
    - Click **Create files** to finalize your request.
    - The ZIP file will be ready in a few hours. 
 
+# CLI version
+
 ## Usage
 
 Run the script from the command line as follows:
@@ -83,3 +85,50 @@ This command will:
   - `results/following.txt`
   - `results/followers.txt`
   - `results/unfollowers.txt`
+
+---
+
+# GUI version
+
+Here's a sample README section for your GUI version of the Instagram Unfollow Checker. This section provides an overview of the application, its features, and instructions for usage.
+
+## Overview
+
+The **Insta Unfollow Checker Viewer** is a graphical user interface (GUI) application built with Python's Tkinter library. It allows users to easily manage and view their Instagram unfollowers by loading data from a ZIP file containing Instagram data or from a text file with usernames. The application provides a user-friendly interface to visualize and interact with the list of unfollowers.
+
+## Features
+
+- **Load Instagram Data**: Open a ZIP file containing your Instagram data to extract the list of unfollowers.
+- **Load Usernames from File**: Import a list of usernames from a text file.
+- **View Unfollowers**: Display the list of unfollowers in a scrollable table.
+- **Remove Users**: Easily remove selected users from the list.
+- **Visit Profiles**: Open selected Instagram profiles directly in your web browser.
+- **Save List**: Save the current list of unfollowers to a text file for future reference.
+
+## Installation
+Run the application using the command:
+
+```bash
+python3 checker_viewer.py
+
+# Or
+
+./checker_viewer.py
+```
+
+## Usage
+
+1. **Open ZIP File**: Click the "Open" button to select a ZIP file containing your Instagram data.
+2. **Load Usernames**: Click the "Load" button to select a text file with usernames.
+3. **View Unfollowers**: The unfollowers will be displayed in the table. You can scroll through the list.
+4. **Remove Users**: Select a user and press the `Delete` key or click the "Remove" button to delete them from the list.
+5. **Visit Profile**: Select a user and click the "Visit" button to open their Instagram profile in your web browser.
+6. **Save List**: Click the "Save" button to save the current list of unfollowers to a text file named `unfollowers.txt`.
+
+## Screeshot
+![GUI](screenshots/gui.png)
+
+
+## TODO
+- crossplatform
+- GUI design

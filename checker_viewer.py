@@ -6,7 +6,9 @@ from tkinter import ttk, messagebox
 from checker import InstaUnfollowChecker
 import webbrowser
 
+insta_url = "https://www.instagram.com/"
 save_list_to_file = "unfollowers.txt"
+program_name = "Instagram Unfollow Checker Viewer"
 
 
 class InstaUnfollowCheckerViewer(tk.Frame):
@@ -18,7 +20,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.created_buttons = False
 
         super().__init__(master)
-        master.title("Insta Unfollow Checker Viewer")
+        master.title(program_name)
         master.geometry(f"{width}x{height}")
         self.pack(fill=tk.BOTH, expand=True)
 
@@ -57,7 +59,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.create_button(
             "Load",
             self.load_list_from_file,
-            "Click to open the ZIP file\nwith the Instagram Data",
+            "Click to load list from a file",
             "left"
         )
 
@@ -98,7 +100,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         # Loop through all the selected items
         for item_id in selected_items:
             username = self.tree.item(item_id, "values")[0]
-            url = f"https://www.instagram.com/{username}/"
+            url = f"{insta_url}{username}/"
             try:
                 webbrowser.open(url)
             except Exception as e:
