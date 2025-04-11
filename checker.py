@@ -147,7 +147,7 @@ class InstaUnfollowChecker:
                 print(f"{self.search_name} is not following you.")
             print()  # Print newline
 
-    def run(self) -> None:
+    def run(self) -> None|list[str]:
         """Run the checker"""
 
         following: list[str] = []
@@ -190,6 +190,8 @@ class InstaUnfollowChecker:
 
         except Exception as e:
             print(f"{ERROR} {e}\n", file=stderr)
+
+        return None
 
 
 def parse_args():

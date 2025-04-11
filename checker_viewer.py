@@ -2,15 +2,19 @@
 
 import tkinter as tk
 from tkinter import filedialog
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from checker import InstaUnfollowChecker
 import webbrowser
 
+save_list_to_file = "unfollowers.txt"
+
+
 class InstaUnfollowCheckerViewer(tk.Frame):
     def __init__(self, master, width=400, height=600):
-        self.filepath: str = ""
-        self.unfollowers: list[str] = []
+        self.filepath = ""
+        self.unfollowers = []
         self.check_vars = {}
+        self.visit_btn = None
 
         super().__init__(master)
         master.title("Insta Unfollow Checker Viewer")
@@ -25,7 +29,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.top_frame.pack(fill=tk.X)
 
         # Button to open ZIP file
-        open_zip_btn = tk.Button(self.top_frame, text="Open Zip", command=self.open_zip)
+        open_zip_btn = tk.Button(self.top_frame, text="Open", command=self.open_zip)
         open_zip_btn.pack(padx=10, pady=5, side=tk.LEFT)
 
         # Treeview and Scrollbar
@@ -66,7 +70,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
             # Remove the current item from the Treeview
             self.tree.delete(item_id)
 
-    def get_unfollowers(self) -> list[str]:
+    def get_unfollowers(self) -> None|list[str]:
         checker = InstaUnfollowChecker(
             self.filepath,
             "",
@@ -89,31 +93,82 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         for item_id in selected_items:
             username = self.tree.item(item_id, "values")[0] 
             url = f"https://www.instagram.com/{username}/"
-            webbrowser.open(url)
+            try:
+                webbrowser.open(url)
+            except Exception as e:
+                messagebox.showerror("Error", f"Error opening browser: {e}")
 
     def open_zip(self) -> None:
-        self.filepath = filedialog.askopenfilename(title="Select a Zip file", filetypes=[("Zip files", "*.zip")])
+        """
+        Open the ZIP file containing the Instagram Data
+        """
+        # Open the ZIP file by selecting it from the file dialog
+        self.filepath = filedialog.askopenfilename(
+                title="Select a Zip file",
+                filetypes=[("Zip files", "*.zip")]
+            )
+
         self.unfollowers = self.get_unfollowers()
+        if not self.unfollowers:
+            messagebox.showerror("Error", f"Unfollowers list is empty")
+            return
+
+        # Add users on the Tree
         self.populate_table()
 
-        # Button to visit the selected user's account
-        visit_btn = tk.Button(self.top_frame, text="Visit Account", command=self.open_profile)
-        visit_btn.pack(padx=10, pady=5, side=tk.LEFT)
+        # Only create buttons if not created already
+        if not self.visit_btn:
+            # Button to visit the selected user's account
+            self.visit_btn = tk.Button(
+                    self.top_frame,
+                    text="Visit",
+                    command=self.open_profile
+                )
+            self.visit_btn.pack(padx=10, pady=5, side=tk.LEFT)
 
-        # Button to delete the selected account from the list
-        remove_btn = tk.Button(self.top_frame, text="Remove", command=self.remove_selected_entry)
-        remove_btn.pack(padx=10, pady=5, side=tk.LEFT)
+            # Button to delete the selected account from the list
+            remove_btn = tk.Button(
+                    self.top_frame,
+                    text="Remove",
+                    command=self.remove_selected_entry
+                )
+            remove_btn.pack(padx=10, pady=5, side=tk.LEFT)
 
-        # Bind the hover events to show/hide tooltip
-        self.create_tooltip(
-                visit_btn,
-                "Click to visit the account\nin your web browser",
-                "right"
-            )
-        self.create_tooltip(
-                remove_btn,
-                "Click to remove the selected\naccount from the list",
-                "right"
+            # Button to save the list to an outfile
+            save_btn = tk.Button(
+                    self.top_frame,
+                    text="Save",
+                    command=self.save_list_to_file
+                )
+            save_btn.pack(padx=10, pady=5, side=tk.LEFT)
+
+            # Bind the hover events to show/hide tooltip
+            self.create_tooltip(
+                    self.visit_btn,
+                    "Click to visit the account\nin your web browser",
+                    "right"
+                )
+            self.create_tooltip(
+                    remove_btn,
+                    "Click to remove the selected\naccount from the list",
+                    "right"
+                )
+            self.create_tooltip(
+                    save_btn,
+                    "Click to save the list to a file",
+                    "right"
+                )
+            
+    def save_list_to_file(self):
+        try:
+            with open(save_list_to_file, 'w') as file:
+                for username in self.unfollowers:
+                    file.write(f"{username}\n")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error while saving data: {e}")
+
+        messagebox.showinfo(
+                "Information", f"Saved list to {save_list_to_file}."
             )
 
     def create_tooltip(self, widget, text: str, side: str) -> None:
