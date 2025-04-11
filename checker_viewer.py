@@ -162,7 +162,10 @@ class InstaUnfollowCheckerViewer(tk.Frame):
     def save_list_to_file(self):
         try:
             with open(save_list_to_file, 'w') as file:
-                for username in self.unfollowers:
+                # Loop through all items in the Treeview
+                for item_id in self.tree.get_children():
+                    # Get the values of the current item
+                    username = self.tree.item(item_id, "values")[0]
                     file.write(f"{username}\n")
         except Exception as e:
             messagebox.showerror("Error", f"Error while saving data: {e}")
