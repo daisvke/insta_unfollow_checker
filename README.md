@@ -128,7 +128,6 @@ python3 checker_viewer.py
 ## Screeshot
 ![GUI](screenshots/gui.png)
 
-
 ## TODO
 - crossplatform
 - GUI design

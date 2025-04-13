@@ -172,6 +172,7 @@ class InstaUnfollowChecker:
             unfollowers, count = self.get_unfollowers(following, followers)
 
             if self.return_list:
+                unfollowers.sort()
                 return unfollowers
 
             self.print_results(unfollowers, followers, count)

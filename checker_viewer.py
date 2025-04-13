@@ -27,16 +27,34 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self) -> None:
-        # Top grey bar
-        self.top_frame = tk.Frame(self, bg='grey', height=40)
+        # Top dark bar
+        self.top_frame = tk.Frame(self, bg='#3C3C3C', height=40)
         self.top_frame.pack(fill=tk.X)
 
         # Treeview and Scrollbar
+
         self.tree_frame = tk.Frame(self)
         self.tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        self.tree_scroll = tk.Scrollbar(self.tree_frame)
+        self.tree_scroll = tk.Scrollbar(
+                self.tree_frame, bg='#3C3C3C', troughcolor='#2E2E2E'
+            )  # Dark scrollbar
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Configure Treeview style for dark mode
+        style = ttk.Style()
+        style.theme_use('clam')  # Use clam theme for better customization
+        style.configure(
+                "Treeview",
+                background="#2E2E2E",
+                foreground="white",
+                fieldbackground="#2E2E2E"
+            )
+        style.configure(
+                "Treeview.Heading",
+                background="#3C3C3C",
+                foreground="white"
+            )
 
         self.tree = ttk.Treeview(
                 self.tree_frame, columns=("Users"), show="headings",
@@ -76,6 +94,10 @@ class InstaUnfollowCheckerViewer(tk.Frame):
 
         # Loop through all the selected items
         for item_id in selected_items:
+            # Update the unfollowers list
+            username = self.tree.item(item_id, "values")[0]
+            self.unfollowers.remove(username)
+
             # Remove the current item from the Treeview
             self.tree.delete(item_id)
 
@@ -162,9 +184,7 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         try:
             with open(save_list_to_file, 'w') as file:
                 # Loop through all items in the Treeview
-                for item_id in self.tree.get_children():
-                    # Get the values of the current item
-                    username = self.tree.item(item_id, "values")[0]
+                for username in self.unfollowers:
                     file.write(f"{username}\n")
         except Exception as e:
             messagebox.showerror("Error", f"Error while saving data: {e}")
@@ -201,7 +221,13 @@ class InstaUnfollowCheckerViewer(tk.Frame):
         btn = tk.Button(
                 self.top_frame,
                 text=text,
-                command=cmd
+                command=cmd,
+                bg='#3C3C3C',  # Dark background color for the button
+                fg='white',     # Light text color for the button
+                activebackground='#4C4C4C',  # Darker background when active
+                activeforeground='white',     # Light text color when active
+                borderwidth=1,
+                relief='flat'   # Flat relief for a modern look
             )
         btn.pack(padx=10, pady=5, side=tk.LEFT)
 
