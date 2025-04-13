@@ -181,17 +181,29 @@ class InstaUnfollowCheckerViewer(tk.Frame):
             self.create_buttons_to_handle_list()
 
     def save_list_to_file(self):
+        # Open a file dialog to ask for the save location and filename
+        filepath = filedialog.asksaveasfilename(
+            title="Save As",
+            defaultextension=".txt",  # Default file extension
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+
+        # Check if the user canceled the dialog
+        if not filepath:
+            return  # Exit the function if no file was selected
+
         try:
-            with open(save_list_to_file, 'w') as file:
+            with open(filepath, 'w') as file:
                 # Loop through all items in the Treeview
                 for username in self.unfollowers:
                     file.write(f"{username}\n")
         except Exception as e:
             messagebox.showerror("Error", f"Error while saving data: {e}")
+            return  # Exit the function if an error occurred
 
         messagebox.showinfo(
-                "Information", f"Saved list to {save_list_to_file}."
-            )
+            "Information", f"Saved list to {filepath}."
+        )
 
     def create_buttons_to_handle_list(self) -> None:
         self.create_button(
