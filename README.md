@@ -1,6 +1,8 @@
 # Instagram Unfollow Checker
 
-This Python script checks for users who are not following you back on Instagram. It processes a ZIP file containing lists of your followers and the accounts you are following, and it outputs the usernames of those who do not follow you back.
+- This Python program checks for users who are not following you back on Instagram. It processes a ZIP file containing lists of your followers and the accounts you are following, and it outputs the usernames of those who do not follow you back.
+
+- This method may take a long time to process, as you will need to wait for the Instagram data to be delivered to your account, but it does not require your credentials.
 
 ## Features
 
