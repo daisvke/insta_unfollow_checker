@@ -125,9 +125,5 @@ python3 checker_viewer.py
 5. **Visit Profile**: Select a user and click the "Visit" button to open their Instagram profile in your web browser.
 6. **Save List**: Click the "Save" button to save the current list of unfollowers to a text file named `unfollowers.txt`.
 
-## Screeshot
+## Screenshot
 ![GUI](screenshots/gui.png)
-
-## TODO
-- crossplatform
-- GUI design
