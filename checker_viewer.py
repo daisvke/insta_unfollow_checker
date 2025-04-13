@@ -11,6 +11,18 @@ program_name = "Instagram Unfollow Checker Viewer"
 
 
 class InstaUnfollowCheckerViewer(tk.Frame):
+    """
+    InstaUnfollowCheckerViewer is a Tkinter-based GUI application
+    that allows users to manage and view their Instagram unfollowers.
+    The application provides the following functionalities:
+
+    - Load Instagram data from a ZIP file containing user information.
+    - Display a list of unfollowers in a Treeview widget.
+    - Remove selected users from the list.
+    - Save the list of unfollowers to a file.
+    - Open selected user profiles directly in a web browser.
+    """
+
     def __init__(self, master, width=400, height=600):
         self.filepath = ""
         self.unfollowers = []
