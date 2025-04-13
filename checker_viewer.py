@@ -7,7 +7,6 @@ from checker import InstaUnfollowChecker
 import webbrowser
 
 insta_url = "https://www.instagram.com/"
-save_list_to_file = "unfollowers.txt"
 program_name = "Instagram Unfollow Checker Viewer"
 
 
